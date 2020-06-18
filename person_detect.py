@@ -39,14 +39,13 @@ class PersonDetect:
     Class for the Person Detection Model.
     '''
 
-    def __init__(self, model_name, device, threshold=0.60):
+    def __init__(self, model_name, device, threshold=0.80):
         self.model_weights = model_name + '.bin'
         self.model_structure = model_name + '.xml'
         self.device = device
         self.threshold = float(threshold)
         self.net = None
-        self.asynchronous_infer = None
-
+        
         try:
             core = IECore()
             self.model = core.read_network(self.model_structure, self.model_weights)
@@ -144,7 +143,7 @@ def main(args):
     pd = PersonDetect(model, device, threshold)
     pd.load_model()
     total_model_load_time = time.time() - start_model_load_time
-    print(total_model_load_time)
+    print("Total Model Load Time: {:}".format(total_model_load_time))
 
     queue = Queue()
 
@@ -201,7 +200,9 @@ def main(args):
 
         total_time = time.time() - start_inference_time
         total_inference_time = round(total_time, 1)
+        print("Total Inference Time: {}seconds".format(total_inference_time))
         fps = counter / total_inference_time
+        print("Inference speed: {}fps".format(fps))
 
         with open(os.path.join(output_path, 'stats.txt'), 'w') as f:
             f.write(str(total_inference_time) + '\n')
